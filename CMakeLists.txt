@@ -124,17 +124,19 @@ target_compile_options(otr_frameworks
         ${FIRST_PARTY_COMPILE_FLAGS}
 )
 
-add_executable(ot_cli_${PLATFORM_NAME}
-    ${SRC_DIR}/apps/cli/main.c
-    ${SRC_DIR}/core/io_redirect.c
-)
+if (NOT ${WITHOUT_APPS})
+    add_executable(ot_cli_${PLATFORM_NAME}
+        ${SRC_DIR}/apps/cli/main.c
+        ${SRC_DIR}/core/io_redirect.c
+    )
 
-target_link_libraries(ot_cli_${PLATFORM_NAME}
-    PUBLIC
-        test_app
-)
+    target_link_libraries(ot_cli_${PLATFORM_NAME}
+        PUBLIC
+            test_app
+    )
+endif()
 
-if (${PLATFORM_NAME} STREQUAL nrf52)
+if (${PLATFORM_NAME} STREQUAL nrf52 AND (NOT ${WITHOUT_APPS}) )
     add_executable(ot_demo_101
         ${SRC_DIR}/apps/cli/main.c
         ${SRC_DIR}/core/io_redirect.c

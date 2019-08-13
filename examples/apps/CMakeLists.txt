@@ -28,40 +28,44 @@
 
 cmake_minimum_required (VERSION 3.7)
 
-add_library(test_app
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/http.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/mqtt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/tcp_utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/user.cpp
-)
+if(NOT ${WITHOUT_APPS})
 
-target_include_directories(test_app
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-target_link_libraries(test_app
-    PUBLIC
-        otr_frameworks
-)
-
-add_custom_target(
-    client_cfg
-    COMMAND
-        ${CMAKE_CURRENT_SOURCE_DIR}/script/generate_cloudiot_cfg.sh
-        ${CLOUDIOT_DEVICE} ${CLOUDIOT_REGISTRY} ${CLOUDIOT_PROJECT}
-        ${CLOUDIOT_REGION} ${CLOUDIOT_PRIV_KEY}
-)
-
-add_dependencies(test_app client_cfg)
-
-if (${PLATFORM_NAME} STREQUAL nrf52)
-    add_library(demo_101
-        ${CMAKE_CURRENT_SOURCE_DIR}/demo_101/demo_101.cpp
+    add_library(test_app
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/http.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/mqtt.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/tcp_utils.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/user.cpp
     )
 
-    target_link_libraries(demo_101
+    target_include_directories(test_app
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    target_link_libraries(test_app
         PUBLIC
             otr_frameworks
     )
+
+    add_custom_target(
+        client_cfg
+        COMMAND
+            ${CMAKE_CURRENT_SOURCE_DIR}/script/generate_cloudiot_cfg.sh
+            ${CLOUDIOT_DEVICE} ${CLOUDIOT_REGISTRY} ${CLOUDIOT_PROJECT}
+            ${CLOUDIOT_REGION} ${CLOUDIOT_PRIV_KEY}
+    )
+
+    add_dependencies(test_app client_cfg)
+
+    if (${PLATFORM_NAME} STREQUAL nrf52)
+        add_library(demo_101
+            ${CMAKE_CURRENT_SOURCE_DIR}/demo_101/demo_101.cpp
+        )
+
+        target_link_libraries(demo_101
+            PUBLIC
+                otr_frameworks
+        )
+    endif()
+
 endif()
