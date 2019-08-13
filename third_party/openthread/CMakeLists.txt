@@ -73,6 +73,10 @@ if (${PLATFORM_NAME} STREQUAL nrf52 AND USB_CDC)
     set(OT_SWITCHES "${OT_SWITCHES} USB=1")
 endif()
 
+if (NOT ${WITHOUT_CLI})
+    set(OT_SWITCHES "${OT_SWITCHES} DISABLE_TRANSPORTS=1")
+endif()
+
 ExternalProject_Add(ot
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
     CONFIGURE_COMMAND ${SHELL} -c "cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap" && env CPPFLAGS=${OT_CPPFLAGS} ${SHELL} -c "CPPFLAGS=\${CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-${OT_PLATFORM_NAME} ${OT_SWITCHES} configure"
@@ -139,9 +143,11 @@ add_library(openthread_ftd STATIC IMPORTED)
 set_property(TARGET openthread_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-ftd.a)
 set_property(TARGET openthread_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES mbedtls)
 
-add_library(openthread_cli_ftd STATIC IMPORTED)
-set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-cli-ftd.a)
-set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES otr_core)
+if (NOT ${WITHOUT_CLI})
+    add_library(openthread_cli_ftd STATIC IMPORTED)
+    set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-cli-ftd.a)
+    set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES otr_core)
+endif()
 
 add_library(ot_platform_${PLATFORM_NAME} STATIC IMPORTED)
 set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-${OT_PLATFORM_NAME}.a)
@@ -202,12 +208,18 @@ add_library(openthread INTERFACE)
 target_link_libraries(openthread
     INTERFACE
         mbedcrypto
-        openthread_cli_ftd
         openthread_diag
         openthread_ftd
         openthread_platform_utils
         ot_platform_${PLATFORM_NAME}
 )
+
+if (NOT ${WITHOUT_CLI})
+    target_link_libraries(openthread
+        INTERFACE
+	    openthread_cli_ftd
+    )
+endif()
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
     target_link_libraries(platform_${PLATFORM_NAME}
