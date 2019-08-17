@@ -60,9 +60,11 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/include
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/drivers/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/drivers/src
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/hal
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/mdk
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/cmsis
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/softdevice/s140/headers
     )
 endif()
 
