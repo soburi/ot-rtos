@@ -75,8 +75,8 @@
 #define configUSE_NEWLIB_REENTRANT                               0
 #define configENABLE_BACKWARD_COMPATIBILITY                      1
 
-#define configSUPPORT_STATIC_ALLOCATION                          1
-#define configSUPPORT_DYNAMIC_ALLOCATION                         1
+//#define configSUPPORT_STATIC_ALLOCATION                          1
+//#define configSUPPORT_DYNAMIC_ALLOCATION                         1
 
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK                                      0
@@ -130,7 +130,7 @@
 #define INCLUDE_eTaskGetState                                    1
 #define INCLUDE_xEventGroupSetBitFromISR                         1
 #define INCLUDE_xTimerPendFunctionCall                           1
-
+#if 0
 /* Code below should be only used by the compiler, and not the assembler. */
 #if !(defined(__ASSEMBLY__) || defined(__ASSEMBLER__))
     #include "nrf.h"
@@ -144,7 +144,7 @@
         #error "This port requires __NVIC_PRIO_BITS to be defined"
     #endif
 #endif /* !assembler */
-
+#endif
 /* The lowest interrupt priority that can be used in a call to a "set priority"
 function. */
 #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY                   0xf
@@ -171,7 +171,6 @@ PRIORITY THAN THIS! (higher priorities are lower numeric values. */
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY                          configLIBRARY_LOWEST_INTERRUPT_PRIORITY
-
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY                     configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
@@ -181,6 +180,7 @@ standard names - or at least those used in the unmodified vector table. */
 
 #define vPortSVCHandler                                          SVC_Handler
 #define xPortPendSVHandler                                       PendSV_Handler
+
 
 /*-----------------------------------------------------------
  * Settings that are generated automatically
@@ -231,9 +231,11 @@ standard names - or at least those used in the unmodified vector table. */
      */
 #define configUSE_DISABLE_TICK_AUTO_CORRECTION_DEBUG     0
 
+#if 0
 // Sysview require at least debug level 3
 #if CFG_DEBUG >= 3
 #include "sysview/SEGGER_SYSVIEW_FreeRTOS.h"
+#endif
 #endif
 
 #endif /* FREERTOS_CONFIG_H */
