@@ -84,10 +84,14 @@ if (${PLATFORM_NAME} STREQUAL nrf52 AND USB_CDC)
     set(OT_SWITCHES "${OT_SWITCHES} USB=1")
 endif()
 
+if (${WITHOUT_CLI})
+    set(OT_SWITCHES "${OT_SWITCHES} DISABLE_TRANSPORTS=1")
+endif()
+
 ExternalProject_Add(ot
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
     CONFIGURE_COMMAND ${SHELL} -c "cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap" && env CPPFLAGS=${OT_CPPFLAGS} ${SHELL} -c "CPPFLAGS=\${CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-${OT_PLATFORM_NAME} ${OT_SWITCHES} configure"
-    BUILD_COMMAND env CPPFLAGS=${OT_CPPFLAGS} ${SHELL} -c "CPPFLAGS=\${CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-${OT_PLATFORM_NAME} ${OT_SWITCHES}"
+    BUILD_COMMAND env CPPFLAGS=${OT_CPPFLAGS} ${SHELL} -c "CPPFLAGS=\${CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-${OT_PLATFORM_NAME} ${OT_SWITCHES} build"
     INSTALL_COMMAND cmake -E echo "Skipping install step."
     BUILD_ALWAYS TRUE
     EXCLUDE_FROM_ALL TRUE
@@ -101,7 +105,7 @@ add_dependencies(openthread_config ot-configure)
 target_include_directories(openthread_config
     INTERFACE
         ${BINARY_DIR}/build/${OT_BUILD_DIR}/include
-        ${BINARY_DIR}/output/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/
@@ -145,26 +149,28 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
 endif()
 
 add_library(openthread_platform_utils STATIC IMPORTED)
-set_property(TARGET openthread_platform_utils PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-platform-utils.a)
+set_property(TARGET openthread_platform_utils PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/examples/platforms/utils/libopenthread-platform-utils.a)
 
 add_library(openthread_ftd STATIC IMPORTED)
-set_property(TARGET openthread_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-ftd.a)
+set_property(TARGET openthread_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/src/core/libopenthread-ftd.a)
 set_property(TARGET openthread_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES mbedtls)
 
-add_library(openthread_cli_ftd STATIC IMPORTED)
-set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-cli-ftd.a)
-set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES otr_core)
+if (NOT ${WITHOUT_CLI})
+    add_library(openthread_cli_ftd STATIC IMPORTED)
+    set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/src/cli/libopenthread-cli-ftd.a)
+    set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES otr_core)
+endif()
 
 add_library(ot_platform_${PLATFORM_NAME} STATIC IMPORTED)
-set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-${OT_PLATFORM_NAME}.a)
+set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/examples/platforms/nrf528xx/libopenthread-${OT_PLATFORM_NAME}.a)
 set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES openthread_ftd)
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
     add_library(nrf52840_radio STATIC IMPORTED)
-    set_property(TARGET nrf52840_radio PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libnordicsemi-nrf52840-radio-driver.a)
+    set_property(TARGET nrf52840_radio PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/third_party/NordicSemiconductor/libnordicsemi-nrf52840-radio-driver.a)
     set_property(TARGET nrf52840_radio PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES openthread_ftd)
     add_library(nrf52840_sdk STATIC IMPORTED)
-    set_property(TARGET nrf52840_sdk PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libnordicsemi-nrf52840-sdk.a)
+    set_property(TARGET nrf52840_sdk PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/third_party/NordicSemiconductor/libnordicsemi-nrf52840-sdk.a)
     set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES nrf52840_radio nrf52840_sdk)
 endif()
 
@@ -172,7 +178,7 @@ add_library(platform_${PLATFORM_NAME} INTERFACE)
 
 target_include_directories(platform_${PLATFORM_NAME}
     INTERFACE
-        ${BINARY_DIR}/output/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
         ${BINARY_DIR}/build/${OT_BUILD_DIR}/include
         ${PLATFORM_CONFIG_INCLUDE_DIRECTORIES}
 )
@@ -220,12 +226,18 @@ add_library(openthread INTERFACE)
 
 target_link_libraries(openthread
     INTERFACE
-        openthread_cli_ftd
         openthread_ftd
         openthread_platform_utils
         ot_platform_${PLATFORM_NAME}
         mbedtls
 )
+
+if (NOT ${WITHOUT_CLI})
+    target_link_libraries(openthread
+        INTERFACE
+	    openthread_cli_ftd
+    )
+endif()
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
     target_link_libraries(platform_${PLATFORM_NAME}
