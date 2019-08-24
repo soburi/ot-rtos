@@ -60,7 +60,9 @@ add_subdirectory(third_party/libjwt)
 add_subdirectory(third_party/lwip)
 add_subdirectory(third_party/mbedtls)
 
-add_subdirectory(examples/apps)
+if (NOT ${WITHOUT_APPS})
+    add_subdirectory(examples/apps)
+endif()
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -105,6 +107,13 @@ target_link_libraries(otr_core
         lwip
 )
 
+#target_compile_definitions(otr_core
+#    PUBLIC
+#        APP_USBD_ENABLED=1
+#        USBD_ENABLED=1
+#	POWER_ENABLED=1
+#	SYSTICK_ENABLED=1
+#)
 
 add_library(otr_frameworks
     ${SRC_DIR}/net/utils/nat64_utils.c
@@ -123,17 +132,19 @@ target_compile_options(otr_frameworks
         ${FIRST_PARTY_COMPILE_FLAGS}
 )
 
-add_executable(ot_cli_${PLATFORM_NAME}
-    ${SRC_DIR}/apps/cli/main.c
-    ${SRC_DIR}/core/io_redirect.c
-)
+if (NOT ${WITHOUT_APPS})
+    add_executable(ot_cli_${PLATFORM_NAME}
+        ${SRC_DIR}/apps/cli/main.c
+        ${SRC_DIR}/core/io_redirect.c
+    )
 
-target_link_libraries(ot_cli_${PLATFORM_NAME}
-    PUBLIC
-        test_app
-)
+    target_link_libraries(ot_cli_${PLATFORM_NAME}
+        PUBLIC
+            test_app
+    )
+endif()
 
-if (${PLATFORM_NAME} STREQUAL nrf52)
+if (${PLATFORM_NAME} STREQUAL nrf52 AND (NOT ${WITHOUT_APPS}) )
     add_executable(ot_demo_101
         ${SRC_DIR}/apps/cli/main.c
         ${SRC_DIR}/core/io_redirect.c
