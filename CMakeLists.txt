@@ -55,41 +55,41 @@ add_subdirectory(third_party/freertos)
 add_subdirectory(third_party/freertos_portable)
 add_subdirectory(third_party/freertos-addons)
 add_subdirectory(third_party/openthread)
-add_subdirectory(third_party/jansson)
-add_subdirectory(third_party/libjwt)
-add_subdirectory(third_party/lwip)
+#add_subdirectory(third_party/jansson)
+#add_subdirectory(third_party/libjwt)
+#add_subdirectory(third_party/lwip)
 add_subdirectory(third_party/mbedtls)
 
-if (NOT ${WITHOUT_APPS})
-    add_subdirectory(examples/apps)
-endif()
+#if (NOT ${WITHOUT_APPS})
+#    add_subdirectory(examples/apps)
+#endif()
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-add_library(otr_core_utils
-    ${SRC_DIR}/core/utils/entropy_utils.c
-)
+#add_library(otr_core_utils
+#    ${SRC_DIR}/core/utils/entropy_utils.c
+#)
 
-target_include_directories(otr_core_utils
-    INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core
-)
+#target_include_directories(otr_core_utils
+#    INTERFACE
+#        ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+#)
 
-target_link_libraries(otr_core_utils
-    PRIVATE
-        openthread
-)
+#target_link_libraries(otr_core_utils
+#    PRIVATE
+#        openthread
+#)
 
-target_compile_options(otr_core_utils
-    PRIVATE
-        ${FIRST_PARTY_COMPILE_FLAGS}
-)
+#target_compile_options(otr_core_utils
+#    PRIVATE
+#        ${FIRST_PARTY_COMPILE_FLAGS}
+#)
 
 add_library(otr_core
-    ${SRC_DIR}/core/netif.cpp
+#    ${SRC_DIR}/core/netif.cpp
     ${SRC_DIR}/core/openthread_freertos.c
     ${SRC_DIR}/core/otr_system.c
-    ${SRC_DIR}/core/uart_lock.c
+#    ${SRC_DIR}/core/uart_lock.c
 )
 
 target_include_directories(otr_core
@@ -104,7 +104,7 @@ target_link_libraries(otr_core
         openthread
         freertos
         mbedtls
-        lwip
+#        lwip
 )
 
 #target_compile_definitions(otr_core
@@ -115,84 +115,84 @@ target_link_libraries(otr_core
 #	SYSTICK_ENABLED=1
 #)
 
-add_library(otr_frameworks
-    ${SRC_DIR}/net/utils/nat64_utils.c
-    ${SRC_DIR}/net/utils/time_ntp.cpp
-)
+#add_library(otr_frameworks
+#    ${SRC_DIR}/net/utils/nat64_utils.c
+#    ${SRC_DIR}/net/utils/time_ntp.cpp
+#)
 
-target_link_libraries(otr_frameworks
-    PUBLIC
-        otr_core
-        jansson
-        libjwt
-)
+#target_link_libraries(otr_frameworks
+#    PUBLIC
+#        otr_core
+#        jansson
+#        libjwt
+#)
 
-target_compile_options(otr_frameworks
-    PRIVATE
-        ${FIRST_PARTY_COMPILE_FLAGS}
-)
+#target_compile_options(otr_frameworks
+#    PRIVATE
+#        ${FIRST_PARTY_COMPILE_FLAGS}
+#)
 
-if (NOT ${WITHOUT_APPS})
-    add_executable(ot_cli_${PLATFORM_NAME}
-        ${SRC_DIR}/apps/cli/main.c
-        ${SRC_DIR}/core/io_redirect.c
-    )
+#if (NOT ${WITHOUT_APPS})
+#    add_executable(ot_cli_${PLATFORM_NAME}
+#        ${SRC_DIR}/apps/cli/main.c
+#        ${SRC_DIR}/core/io_redirect.c
+#    )
+#
+#    target_link_libraries(ot_cli_${PLATFORM_NAME}
+#        PUBLIC
+#            test_app
+#    )
+#endif()
 
-    target_link_libraries(ot_cli_${PLATFORM_NAME}
-        PUBLIC
-            test_app
-    )
-endif()
-
-if (${PLATFORM_NAME} STREQUAL nrf52 AND (NOT ${WITHOUT_APPS}) )
-    add_executable(ot_demo_101
-        ${SRC_DIR}/apps/cli/main.c
-        ${SRC_DIR}/core/io_redirect.c
-    )
-
-    target_link_libraries(ot_demo_101
-        PUBLIC
-            demo_101
-    )
-
-    target_compile_definitions(ot_demo_101
-        PUBLIC
-            __HEAP_SIZE=8192
-            __STACK_SIZE=8192
-    )
-
-    target_compile_definitions(ot_cli_${PLATFORM_NAME}
-        PUBLIC
-            __HEAP_SIZE=8192
-            __STACK_SIZE=8192
-    )
-
+#if (${PLATFORM_NAME} STREQUAL nrf52 AND (NOT ${WITHOUT_APPS}) )
+#    add_executable(ot_demo_101
+#        ${SRC_DIR}/apps/cli/main.c
+#        ${SRC_DIR}/core/io_redirect.c
+#    )
+#
+#    target_link_libraries(ot_demo_101
+#        PUBLIC
+#            demo_101
+#    )
+#
+#    target_compile_definitions(ot_demo_101
+#        PUBLIC
+#            __HEAP_SIZE=8192
+#            __STACK_SIZE=8192
+#    )
+#
+#    target_compile_definitions(ot_cli_${PLATFORM_NAME}
+#        PUBLIC
+#            __HEAP_SIZE=8192
+#            __STACK_SIZE=8192
+#    )
+#
     #special link script
-    set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld)
-    set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
-    set_target_properties(ot_demo_101 PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld)
-    set_target_properties(ot_demo_101 PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
+    #    set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld)
+    #    set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
+    #    set_target_properties(ot_demo_101 PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld)
+    #    set_target_properties(ot_demo_101 PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf528xx/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
 
     #build hex file
-    add_custom_command(OUTPUT ot_cli_${PLATFORM_NAME}.hex
-        COMMAND arm-none-eabi-objcopy -O ihex ot_cli_${PLATFORM_NAME} ot_cli_${PLATFORM_NAME}.hex
-        DEPENDS ot_cli_${PLATFORM_NAME}
-    )
-    add_custom_target(ot_cli_nrf52_hex ALL DEPENDS ot_cli_${PLATFORM_NAME}.hex)
+    #    add_custom_command(OUTPUT ot_cli_${PLATFORM_NAME}.hex
+    #        COMMAND arm-none-eabi-objcopy -O ihex ot_cli_${PLATFORM_NAME} ot_cli_${PLATFORM_NAME}.hex
+    #        DEPENDS ot_cli_${PLATFORM_NAME}
+    #    )
+    #    add_custom_target(ot_cli_nrf52_hex ALL DEPENDS ot_cli_${PLATFORM_NAME}.hex)
 
-    add_custom_command(OUTPUT ot_demo_101.hex
-        COMMAND arm-none-eabi-objcopy -O ihex ot_demo_101 ot_demo_101.hex
-        DEPENDS ot_demo_101
-    )
-    add_custom_target(ot_demo_101_hex ALL DEPENDS ot_demo_101.hex)
-endif()
+    #    add_custom_command(OUTPUT ot_demo_101.hex
+    #        COMMAND arm-none-eabi-objcopy -O ihex ot_demo_101 ot_demo_101.hex
+    #        DEPENDS ot_demo_101
+    #    )
+    #    add_custom_target(ot_demo_101_hex ALL DEPENDS ot_demo_101.hex)
+    #endif()
 
-set(PORT_DIRS 
-    ./third_party/freertos-addons/port
-    ./third_party/lwip/port
-)
-add_custom_target(pretty
-    find src include ${PORT_DIRS} \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) -exec bash -c "echo Beautify '{}' && third_party/openthread/repo/script/clang-format.sh -i '{}'" \;
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    VERBATIM
-    )
+    #set(PORT_DIRS 
+    #    ./third_party/freertos-addons/port
+#    ./third_party/lwip/port
+#)
+#add_custom_target(pretty
+#    find src include ${PORT_DIRS} \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) -exec bash -c "echo Beautify '{}' && third_party/openthread/repo/script/clang-format.sh -i '{}'" \;
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#    VERBATIM
+#    )

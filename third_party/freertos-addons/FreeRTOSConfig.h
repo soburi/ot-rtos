@@ -115,6 +115,8 @@ extern "C" {
 
 #define configMAX_PRIORITIES (7)
 
+#define configSUPPORT_STATIC_ALLOCATION 1
+
 /* Run time stats gathering configuration options. */
 unsigned long ulGetRunTimeCounterValue(void); /* Prototype of function that returns run time counter. */
 #define configGENERATE_RUN_TIME_STATS 1

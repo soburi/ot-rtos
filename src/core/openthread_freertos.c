@@ -33,9 +33,10 @@
 
 #include <FreeRTOS.h>
 #include <task.h>
+#include <semphr.h>
 
-#include <lwip/netdb.h>
-#include <lwip/tcpip.h>
+//#include <lwip/netdb.h>
+//#include <lwip/tcpip.h>
 
 #include <openthread-core-config.h>
 #include <openthread-system.h>
@@ -48,7 +49,7 @@
 #include "netif.h"
 #include "otr_system.h"
 #include "uart_lock.h"
-#include "net/utils/nat64_utils.h"
+//#include "net/utils/nat64_utils.h"
 #include "portable/portable.h"
 
 static TaskHandle_t      sMainTask     = NULL;
@@ -79,7 +80,7 @@ static void mainloop(void *aContext)
         otrSystemPoll(instance);
         xSemaphoreTake(sExternalLock, portMAX_DELAY);
         otrSystemProcess(instance);
-        netifProcess(instance);
+        //netifProcess(instance);
     }
 
     otInstanceFinalize(instance);
@@ -112,9 +113,9 @@ void otTaskletsSignalPending(otInstance *aInstance)
 
 void otrInit(int argc, char *argv[])
 {
-    mbedtls_platform_set_calloc_free(mbedtlsCAlloc, mbedtlsFree);
+    //mbedtls_platform_set_calloc_free(mbedtlsCAlloc, mbedtlsFree);
 
-    otrUartLockInit();
+    //otrUartLockInit();
     otSysInit(argc, argv);
 
     sInstance = otInstanceInitSingle();
@@ -123,7 +124,7 @@ void otrInit(int argc, char *argv[])
 #if OPENTHREAD_ENABLE_DIAG
     otDiagInit(sInstance);
 #endif
-    tcpip_init(netifInit, sInstance);
+    //tcpip_init(netifInit, sInstance);
 
     sExternalLock = xSemaphoreCreateMutex();
     assert(sExternalLock != NULL);
