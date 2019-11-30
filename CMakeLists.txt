@@ -58,7 +58,7 @@ add_subdirectory(third_party/openthread)
 #add_subdirectory(third_party/jansson)
 #add_subdirectory(third_party/libjwt)
 #add_subdirectory(third_party/lwip)
-add_subdirectory(third_party/mbedtls)
+#add_subdirectory(third_party/mbedtls)
 
 #if (NOT ${WITHOUT_APPS})
 #    add_subdirectory(examples/apps)
@@ -103,7 +103,7 @@ target_link_libraries(otr_core
     PUBLIC
         openthread
         freertos
-        mbedtls
+#        mbedtls
 #        lwip
 )
 

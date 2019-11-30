@@ -78,7 +78,7 @@ set(OT_CPPFLAGS "-DOPENTHREAD_CONFIG_JOINER_ENABLE=1 \
                  -I$<JOIN:$<TARGET_PROPERTY:otr_core,INTERFACE_INCLUDE_DIRECTORIES>, -I> \
                  -D$<JOIN:$<TARGET_PROPERTY:otr_core,INTERFACE_COMPILE_DEFINITIONS>, -D>")
 
-set(OT_SWITCHES "DISABLE_BUILTIN_MBEDTLS=1 DISABLE_EXECUTABLE=1")
+set(OT_SWITCHES "DISABLE_EXECUTABLE=1")
 
 if (${PLATFORM_NAME} STREQUAL nrf52 AND USB_CDC)
     set(OT_SWITCHES "${OT_SWITCHES} USB=1")
@@ -109,6 +109,7 @@ target_include_directories(openthread_config
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo/include
         ${PLATFORM_CONFIG_INCLUDE_DIRECTORIES}
 )
 
@@ -165,7 +166,13 @@ add_library(ot_platform_${PLATFORM_NAME} STATIC IMPORTED)
 set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/examples/platforms/nrf528xx/libopenthread-${OT_PLATFORM_NAME}.a)
 set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES openthread_ftd)
 
+add_library(mbedtls STATIC IMPORTED)
+set_property(TARGET mbedtls PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/third_party/mbedtls/libmbedcrypto.a)
+
 if (${PLATFORM_NAME} STREQUAL nrf52)
+    add_library(ot_platform_${PLATFORM_NAME}_sdk STATIC IMPORTED)
+    set_property(TARGET ot_platform_${PLATFORM_NAME}_sdk PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/examples/platforms/nrf528xx/libopenthread-${OT_PLATFORM_NAME}-sdk.a)
+    set_property(TARGET ot_platform_${PLATFORM_NAME}_sdk PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES openthread_ftd)
     add_library(nrf52840_radio STATIC IMPORTED)
     set_property(TARGET nrf52840_radio PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/build/${OT_BUILD_DIR}/third_party/NordicSemiconductor/libnordicsemi-nrf52840-radio-driver.a)
     set_property(TARGET nrf52840_radio PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES openthread_ftd)
@@ -229,6 +236,7 @@ target_link_libraries(openthread
         openthread_ftd
         openthread_platform_utils
         ot_platform_${PLATFORM_NAME}
+        ot_platform_${PLATFORM_NAME}_sdk
         mbedtls
 )
 
