@@ -46,9 +46,9 @@
 
 #include <mbedtls/platform.h>
 
-#include "netif.h"
+//#include "netif.h"
 #include "otr_system.h"
-#include "uart_lock.h"
+//#include "uart_lock.h"
 //#include "net/utils/nat64_utils.h"
 #include "portable/portable.h"
 
