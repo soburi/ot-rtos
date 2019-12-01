@@ -51,8 +51,8 @@ set(FIRST_PARTY_COMPILE_FLAGS
    >
 )
 
-add_subdirectory(third_party/freertos)
-add_subdirectory(third_party/freertos_portable)
+#add_subdirectory(third_party/freertos)
+#add_subdirectory(third_party/freertos_portable)
 #add_subdirectory(third_party/freertos-addons)
 add_subdirectory(third_party/openthread)
 #add_subdirectory(third_party/jansson)
@@ -102,7 +102,7 @@ target_include_directories(otr_core
 target_link_libraries(otr_core
     PUBLIC
         openthread
-        freertos
+#        freertos
 #        mbedtls
 #        lwip
 )

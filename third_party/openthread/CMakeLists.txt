@@ -237,6 +237,7 @@ target_link_libraries(openthread
         openthread_platform_utils
         ot_platform_${PLATFORM_NAME}
         ot_platform_${PLATFORM_NAME}_sdk
+        nrf52840_radio
         mbedtls
 )
 
