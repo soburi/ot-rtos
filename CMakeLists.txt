@@ -107,13 +107,13 @@ target_link_libraries(otr_core
 #        lwip
 )
 
-#target_compile_definitions(otr_core
-#    PUBLIC
-#        APP_USBD_ENABLED=1
-#        USBD_ENABLED=1
-#	POWER_ENABLED=1
-#	SYSTICK_ENABLED=1
-#)
+target_compile_definitions(otr_core
+    PUBLIC
+        APP_USBD_ENABLED=1
+        USBD_ENABLED=1
+	POWER_ENABLED=1
+	SYSTICK_ENABLED=1
+)
 
 #add_library(otr_frameworks
 #    ${SRC_DIR}/net/utils/nat64_utils.c
